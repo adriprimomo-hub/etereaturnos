@@ -7,7 +7,7 @@ import { ReportesServicios } from "@/components/reportes/reportes-servicios"
 import { ConfigForm } from "@/components/config/config-form"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Suspense, useEffect, useMemo, useState } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
 
 export default function DashboardPage() {
   return (
@@ -26,17 +26,21 @@ export default function DashboardPage() {
 function DashboardContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const pathname = usePathname()
   const allowedTabs = useMemo(() => new Set(["turnos", "clientes", "servicios", "reportes", "config"]), [])
   const searchTab = searchParams.get("tab") || ""
-  const [tab, setTab] = useState<string>(allowedTabs.has(searchTab) ? searchTab : "turnos")
+  const pathTab = pathname?.endsWith("/config") ? "config" : ""
+  const initialTab = allowedTabs.has(pathTab) ? pathTab : allowedTabs.has(searchTab) ? searchTab : "turnos"
+  const [tab, setTab] = useState<string>(initialTab)
 
   useEffect(() => {
     const current = searchParams.get("tab") || ""
-    const nextValue = allowedTabs.has(current) ? current : "turnos"
+    const fromPath = pathname?.endsWith("/config") ? "config" : ""
+    const nextValue = allowedTabs.has(fromPath) ? fromPath : allowedTabs.has(current) ? current : "turnos"
     if (nextValue !== tab) {
       setTab(nextValue)
     }
-  }, [allowedTabs, searchParams, tab])
+  }, [allowedTabs, searchParams, pathname, tab])
 
   const handleTabChange = (value: string) => {
     setTab(value)
@@ -64,6 +68,9 @@ function DashboardContent() {
             <TabsTrigger value="reportes" className="flex-1 sm:flex-none">
               Reportes
             </TabsTrigger>
+            <TabsTrigger value="config" className="flex-1 sm:flex-none">
+              Configuracion
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="turnos" className="mt-6">
@@ -81,9 +88,12 @@ function DashboardContent() {
           <TabsContent value="reportes" className="mt-6">
             <ReportesServicios />
           </TabsContent>
+
+          <TabsContent value="config" className="mt-6">
+            <ConfigForm />
+          </TabsContent>
         </Tabs>
       </div>
     </div>
   )
 }
-
