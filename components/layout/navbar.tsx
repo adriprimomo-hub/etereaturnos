@@ -39,7 +39,7 @@ export function Navbar() {
             <DropdownMenuLabel>Opciones</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild className="gap-2">
-              <Link href="/dashboard?tab=config" className="flex items-center gap-2" prefetch={false}>
+              <Link href="/dashboard/config" className="flex items-center gap-2" prefetch={false}>
                 <SettingsIcon className="h-4 w-4" />
                 Configuración
               </Link>
@@ -54,3 +54,4 @@ export function Navbar() {
     </nav>
   )
 }
+
