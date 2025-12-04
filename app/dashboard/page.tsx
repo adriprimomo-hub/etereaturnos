@@ -64,9 +64,6 @@ function DashboardContent() {
             <TabsTrigger value="reportes" className="flex-1 sm:flex-none">
               Reportes
             </TabsTrigger>
-            <TabsTrigger value="config" className="flex-1 sm:flex-none">
-              Configuracion
-            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="turnos" className="mt-6">
@@ -84,12 +81,9 @@ function DashboardContent() {
           <TabsContent value="reportes" className="mt-6">
             <ReportesServicios />
           </TabsContent>
-
-          <TabsContent value="config" className="mt-6">
-            <ConfigForm />
-          </TabsContent>
         </Tabs>
       </div>
     </div>
   )
 }
+
