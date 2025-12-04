@@ -1,7 +1,8 @@
 import { updateSession } from "@/lib/supabase/middleware"
 
-export async function middleware(request) {
-  return await updateSession(request)
+// Next.js proxy handler (reemplaza al middleware viejo)
+export async function proxy(request) {
+  return updateSession(request)
 }
 
 export const config = {
