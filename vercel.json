@@ -1,0 +1,3 @@
+{
+  "buildCommand": "node -e \"require('fs').writeFileSync('proxy.js', \\\"import { updateSession } from '@/lib/supabase/middleware'\\\\n\\\\nexport async function proxy(request) {\\\\n  return updateSession(request)\\\\n}\\\\n\\\\nexport const config = {\\\\n  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\\\\\\\.svg$).*)'],\\\\n}\\\\n\\\")\" && bun run build"
+}
