@@ -269,46 +269,6 @@ export function TurnosGrid() {
         </Card>
       )}
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Input
-          className="w-full text-sm"
-          placeholder="Buscar cliente o servicio..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-        <Input
-          className="w-full text-sm"
-          type="date"
-          value={filterFecha}
-          onChange={(e) => handleDateChange(e.target.value)}
-        />
-        <Select value={filterEstado} onValueChange={setFilterEstado}>
-          <SelectTrigger className="w-full text-sm">
-            <SelectValue placeholder="Filtrar por estado" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todos</SelectItem>
-            <SelectItem value="pendiente">Pendiente</SelectItem>
-            <SelectItem value="en_curso">En curso</SelectItem>
-            <SelectItem value="completado">Completado</SelectItem>
-            <SelectItem value="cancelado">Cancelado</SelectItem>
-          </SelectContent>
-        </Select>
-        <Select value={filterCliente} onValueChange={setFilterCliente}>
-          <SelectTrigger className="w-full text-sm">
-            <SelectValue placeholder="Filtrar por cliente" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todos</SelectItem>
-            {clientes?.map((c) => (
-              <SelectItem key={c.id} value={c.id}>
-                {`${c.nombre} ${c.apellido}`}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
       <div className="rounded-3xl border bg-card shadow-sm">
         <div className="flex flex-col gap-3 border-b p-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
