@@ -82,19 +82,39 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       return NextResponse.json({ error: turnoError?.message || "Turno no encontrado" }, { status: 404 })
     }
 
-    // Generar token único para la confirmación y guardarlo
-    const token = uuidv4()
-    const { data: tokenRow, error: tokenError } = await supabase
+    if (turno.confirmacion_estado === "confirmado" || turno.confirmacion_estado === "cancelado") {
+      return NextResponse.json(
+        { error: "El turno ya fue respondido", estado: turno.confirmacion_estado },
+        { status: 409 },
+      )
+    }
+
+    const { data: existingToken } = await supabase
       .from("confirmation_tokens")
-      .insert({
-        turno_id: turno.id,
-        token,
-      })
-      .select("token")
+      .select("token, estado")
+      .eq("turno_id", turno.id)
+      .eq("estado", "pendiente")
+      .order("creado_at", { ascending: false })
+      .limit(1)
       .maybeSingle()
 
-    if (tokenError || !tokenRow) {
-      console.error("[send-whatsapp] No se pudo guardar token:", tokenError || "sin datos")
+    // Generar token único para la confirmación y guardarlo
+    const token = existingToken?.token ?? uuidv4()
+    const tokenRow =
+      existingToken ||
+      (
+        await supabase
+          .from("confirmation_tokens")
+          .insert({
+            turno_id: turno.id,
+            token,
+          })
+          .select("token")
+          .maybeSingle()
+      ).data
+
+    if (!tokenRow) {
+      console.error("[send-whatsapp] No se pudo guardar token")
       return NextResponse.json({ error: "No se pudo generar el token de confirmación" }, { status: 500 })
     }
 
@@ -138,10 +158,15 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     const whatsappUrl = `https://wa.me/${clienteTelefono}?text=${encodeURIComponent(mensaje)}`
 
     // Actualizar estado del turno
+    const nextConfirmState =
+      turno.confirmacion_estado === "confirmado" || turno.confirmacion_estado === "cancelado"
+        ? turno.confirmacion_estado
+        : "enviada"
+
     await supabase
       .from("turnos")
       .update({
-        confirmacion_estado: "enviada",
+        confirmacion_estado: nextConfirmState,
         confirmacion_enviada_at: new Date().toISOString(),
       })
       .eq("id", turnoId)
@@ -156,3 +181,4 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     return NextResponse.json({ error: "Error al procesar la solicitud" }, { status: 500 })
   }
 }
+
