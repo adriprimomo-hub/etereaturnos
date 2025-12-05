@@ -37,7 +37,12 @@ export function ConfigForm() {
   useEffect(() => {
     if (config) {
       setMensaje(config.telefono_whatsapp || defaultTemplate)
-      setMetodosPago(config.metodos_pago || [])
+      const allowed = ["efectivo", "tarjeta", "transferencia"]
+      const mapped = (config.metodos_pago || []).map((m) =>
+        m.startsWith("tarjeta") ? "tarjeta" : m,
+      )
+      const filtered = Array.from(new Set(mapped.filter((m) => allowed.includes(m))))
+      setMetodosPago(filtered)
     }
   }, [config])
 
@@ -79,7 +84,7 @@ export function ConfigForm() {
     setMetodosPago((prev) => (prev.includes(metodo) ? prev.filter((m) => m !== metodo) : [...prev, metodo]))
   }
 
-  const metodos_disponibles = ["efectivo", "tarjeta_debito", "tarjeta_credito", "transferencia", "billetera_digital"]
+  const metodos_disponibles = ["efectivo", "tarjeta", "transferencia"]
 
   return (
     <div className="space-y-6">
@@ -182,3 +187,4 @@ export function ConfigForm() {
     </div>
   )
 }
+
