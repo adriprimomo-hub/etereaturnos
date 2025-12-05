@@ -41,6 +41,13 @@ export async function POST(request: Request, { params }: { params: { id: string 
       return Response.json({ error: "Turno no encontrado" }, { status: 404 })
     }
 
+    if (turno.confirmacion_estado === "confirmado" || turno.confirmacion_estado === "cancelado") {
+      return Response.json(
+        { error: "El turno ya fue respondido", estado: turno.confirmacion_estado },
+        { status: 409 },
+      )
+    }
+
     const { data: config } = await supabase
       .from("usuarios")
       .select("telefono_whatsapp")
@@ -50,18 +57,31 @@ export async function POST(request: Request, { params }: { params: { id: string 
     const plantillaRaw = (config?.telefono_whatsapp || "").trim()
     const plantilla = plantillaRaw && !/^[+\d\s-]+$/.test(plantillaRaw) ? plantillaRaw : defaultTemplate
 
-    // Crear token de confirmación
-    const { data: tokenData, error: tokenError } = await supabase
+    const { data: existingToken } = await supabase
       .from("confirmation_tokens")
-      .insert({
-        turno_id: turno.id,
-        token: Math.random().toString(36).substring(7),
-      })
-      .select("token")
+      .select("token, estado")
+      .eq("turno_id", turno.id)
+      .eq("estado", "pendiente")
+      .order("creado_at", { ascending: false })
+      .limit(1)
       .maybeSingle()
 
-    if (tokenError || !tokenData) {
-      console.error("[confirm-whatsapp] No se pudo guardar token:", tokenError || "sin datos")
+    // Crear token de confirmación si no hay uno pendiente
+    const tokenData =
+      existingToken ||
+      (
+        await supabase
+          .from("confirmation_tokens")
+          .insert({
+            turno_id: turno.id,
+            token: Math.random().toString(36).substring(7),
+          })
+          .select("token")
+          .maybeSingle()
+      ).data
+
+    if (!tokenData) {
+      console.error("[confirm-whatsapp] No se pudo guardar token")
       return Response.json({ error: "No se pudo generar el token de confirmación" }, { status: 500 })
     }
 
@@ -110,3 +130,4 @@ export async function POST(request: Request, { params }: { params: { id: string 
     return Response.json({ error: "Error interno" }, { status: 500 })
   }
 }
+
