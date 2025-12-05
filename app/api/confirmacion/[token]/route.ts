@@ -106,6 +106,16 @@ export async function POST(request: Request, { params }: { params: { token: stri
       })
       .eq("token", token)
 
+    // Marcar cualquier otro token pendiente del mismo turno como resuelto
+    await supabaseAdmin
+      .from("confirmation_tokens")
+      .update({
+        estado: nuevoEstado,
+        confirmado_at: new Date().toISOString(),
+      })
+      .eq("turno_id", confirmation.turno_id)
+      .eq("estado", "pendiente")
+
     await supabaseAdmin
       .from("turnos")
       .update({
@@ -120,3 +130,4 @@ export async function POST(request: Request, { params }: { params: { token: stri
     return Response.json({ error: "Error interno" }, { status: 500 })
   }
 }
+
