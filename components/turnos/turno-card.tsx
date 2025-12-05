@@ -29,6 +29,13 @@ export function TurnoCard({ turno, onDelete, onRefresh, clientes, servicios }: T
   const hora = fecha.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })
   const fecha_str = fecha.toLocaleDateString("es-AR")
   const isFutureTurno = fecha.getTime() > Date.now()
+  const timeUntilStartMs = fecha.getTime() - Date.now()
+  const startTooEarly = turno.estado === "pendiente" && timeUntilStartMs > 60 * 60 * 1000
+  const confirmWasSent =
+    turno.confirmacion_estado === "enviada" ||
+    turno.confirmacion_estado === "confirmado" ||
+    turno.confirmacion_estado === "cancelado" ||
+    !!turno.confirmacion_enviada_at
   const canManageConfirmation =
     turno.estado === "pendiente" && isFutureTurno && turno.confirmacion_estado !== "confirmado"
 
@@ -78,13 +85,6 @@ export function TurnoCard({ turno, onDelete, onRefresh, clientes, servicios }: T
     }
   }
 
-  const statusColors: Record<string, string> = {
-    pendiente: "bg-yellow-100 text-yellow-800",
-    en_curso: "bg-blue-100 text-blue-800",
-    completado: "bg-green-100 text-green-800",
-    cancelado: "bg-red-100 text-red-800",
-  }
-
   const confirmacionBadge: Record<string, string> = {
     no_enviada: "bg-gray-100 text-gray-800",
     enviada: "bg-blue-100 text-blue-800",
@@ -103,7 +103,6 @@ export function TurnoCard({ turno, onDelete, onRefresh, clientes, servicios }: T
             <p className="text-xs sm:text-sm text-muted-foreground truncate">{turno.servicios.nombre}</p>
           </div>
           <div className="flex gap-1 flex-wrap">
-            <Badge className={statusColors[turno.estado] || "bg-gray-100"}>{turno.estado}</Badge>
             <Badge className={confirmacionBadge[turno.confirmacion_estado || "no_enviada"]}>
               {turno.confirmacion_estado === "no_enviada" && "Sin enviar"}
               {turno.confirmacion_estado === "enviada" && "Enviada"}
@@ -119,7 +118,7 @@ export function TurnoCard({ turno, onDelete, onRefresh, clientes, servicios }: T
           <p className="text-muted-foreground text-xs sm:text-sm">{fecha_str}</p>
         </div>
         <div className="text-sm">
-          <p className="text-muted-foreground text-xs sm:text-sm">Duración: {turno.duracion_minutos} min</p>
+          <p className="text-muted-foreground text-xs sm:text-sm">Duracion: {turno.duracion_minutos} min</p>
           <p className="text-muted-foreground text-xs sm:text-sm">Precio: ${turno.servicios.precio.toFixed(2)}</p>
         </div>
         {turno.observaciones && (
@@ -139,12 +138,12 @@ export function TurnoCard({ turno, onDelete, onRefresh, clientes, servicios }: T
               {enviandoWhatsapp ? (
                 <>
                   <Loader2Icon className="h-3.5 w-3.5 animate-spin" />
-                  {turno.confirmacion_estado === "enviada" ? "Reenviando..." : "Enviando..."}
+                  {confirmWasSent ? "Reenviando..." : "Enviando..."}
                 </>
               ) : (
                 <>
                   <MessageCircleIcon className="h-3.5 w-3.5" />
-                  {turno.confirmacion_estado === "enviada" ? "Reenviar confirmación" : "Enviar confirmación"}
+                  {confirmWasSent ? "Reenviar confirmacion" : "Enviar confirmacion"}
                 </>
               )}
             </Button>
@@ -154,7 +153,8 @@ export function TurnoCard({ turno, onDelete, onRefresh, clientes, servicios }: T
               size="sm"
               variant="outline"
               onClick={() => handleStatusChange("en_curso")}
-              disabled={loading}
+              disabled={loading || startTooEarly}
+              title={startTooEarly ? "Solo se puede iniciar hasta 1 hora antes del horario pactado" : undefined}
               className="text-xs gap-1.5"
             >
               <PlayIcon className="h-3.5 w-3.5" />
@@ -184,12 +184,15 @@ export function TurnoCard({ turno, onDelete, onRefresh, clientes, servicios }: T
             Editar
           </Button>
         </div>
+        {startTooEarly && (
+          <p className="text-[11px] text-muted-foreground">Solo se puede iniciar hasta 1 hora antes del horario pactado.</p>
+        )}
       </CardContent>
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>
-              Editar turno <span className="text-sm font-normal text-muted-foreground">({hora} · {fecha_str})</span>
+              Editar turno <span className="text-sm font-normal text-muted-foreground">({hora} - {fecha_str})</span>
             </DialogTitle>
           </DialogHeader>
           <TurnoForm
