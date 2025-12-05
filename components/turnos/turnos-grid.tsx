@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { cn } from "@/lib/utils"
 import { TurnoForm } from "./turno-form"
@@ -26,13 +25,6 @@ const fetcher = async <T,>(url: string): Promise<T[]> => {
   return []
 }
 
-const estadoBadge: Record<string, string> = {
-  pendiente: "bg-amber-100 text-amber-800",
-  en_curso: "bg-sky-100 text-sky-800",
-  completado: "bg-emerald-100 text-emerald-800",
-  cancelado: "bg-rose-100 text-rose-800",
-}
-
 const confirmacionBadge: Record<string, string> = {
   no_enviada: "bg-gray-100 text-gray-700",
   enviada: "bg-blue-100 text-blue-800",
@@ -42,7 +34,7 @@ const confirmacionBadge: Record<string, string> = {
 
 const confirmacionLabel: Record<string, string> = {
   no_enviada: "Sin confirmar",
-  enviada: "Confirmación enviada",
+  enviada: "Confirmacion enviada",
   confirmado: "Confirmado",
   cancelado: "Cancelado",
 }
@@ -269,6 +261,46 @@ export function TurnosGrid() {
         </Card>
       )}
 
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <Input
+          className="w-full text-sm"
+          placeholder="Buscar cliente o servicio..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        <Input
+          className="w-full text-sm"
+          type="date"
+          value={filterFecha}
+          onChange={(e) => handleDateChange(e.target.value)}
+        />
+        <Select value={filterEstado} onValueChange={setFilterEstado}>
+          <SelectTrigger className="w-full text-sm">
+            <SelectValue placeholder="Filtrar por estado" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos</SelectItem>
+            <SelectItem value="pendiente">Pendiente</SelectItem>
+            <SelectItem value="en_curso">En curso</SelectItem>
+            <SelectItem value="completado">Completado</SelectItem>
+            <SelectItem value="cancelado">Cancelado</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={filterCliente} onValueChange={setFilterCliente}>
+          <SelectTrigger className="w-full text-sm">
+            <SelectValue placeholder="Filtrar por cliente" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos</SelectItem>
+            {clientes?.map((c) => (
+              <SelectItem key={c.id} value={c.id}>
+                {`${c.nombre} ${c.apellido}`}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
       <div className="rounded-3xl border bg-card shadow-sm">
         <div className="flex flex-col gap-3 border-b p-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -396,10 +428,10 @@ export function TurnosGrid() {
                               <span
                                 className={cn(
                                   "rounded-full px-2 py-0.5 text-[10px] font-semibold capitalize whitespace-nowrap",
-                                  estadoBadge[turno.estado] ?? "bg-secondary text-secondary-foreground",
+                                  confirmacionBadge[confirmState] ?? "bg-secondary text-secondary-foreground",
                                 )}
                               >
-                                {formatLabel(turno.estado)}
+                                {confirmacionLabel[confirmState] ?? formatLabel(confirmState)}
                               </span>
                             </div>
                             <p className="mt-1 text-sm font-semibold leading-tight">
@@ -407,14 +439,6 @@ export function TurnosGrid() {
                             </p>
                             <p className="text-xs text-muted-foreground">{turno.servicios.nombre}</p>
                             <div className="mt-1 flex flex-wrap gap-1">
-                              <Badge
-                                className={cn(
-                                  "rounded-full border-0 px-2 py-0 text-[10px] font-medium",
-                                  confirmacionBadge[confirmState] ?? "bg-gray-100 text-gray-700",
-                                )}
-                              >
-                                {confirmacionLabel[confirmState] ?? formatLabel(confirmState)}
-                              </Badge>
                               {turno.observaciones && (
                                 <span className="truncate text-[11px] text-muted-foreground">{turno.observaciones}</span>
                               )}
