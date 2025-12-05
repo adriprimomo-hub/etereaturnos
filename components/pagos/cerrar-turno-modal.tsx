@@ -79,17 +79,15 @@ export function CerrarTurnoModal({ turno, onSuccess }: CerrarTurnoModalProps) {
           </div>
 
           <div>
-            <label className="text-sm font-medium">Método de Pago</label>
+            <label className="text-sm font-medium">Metodo de Pago</label>
             <Select value={metodoPago} onValueChange={setMetodoPago}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="efectivo">Efectivo</SelectItem>
-                <SelectItem value="tarjeta_debito">Tarjeta Débito</SelectItem>
-                <SelectItem value="tarjeta_credito">Tarjeta Crédito</SelectItem>
+                <SelectItem value="tarjeta">Tarjeta</SelectItem>
                 <SelectItem value="transferencia">Transferencia</SelectItem>
-                <SelectItem value="billetera_digital">Billetera Digital</SelectItem>
               </SelectContent>
             </Select>
           </div>
