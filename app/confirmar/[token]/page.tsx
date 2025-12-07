@@ -121,13 +121,6 @@ export default function ConfirmacionPage() {
         <CardContent className="space-y-5 sm:space-y-7 pt-4 sm:pt-6">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
-              <p className="text-xs sm:text-sm font-medium text-rose-500 uppercase tracking-wide">Cliente</p>
-              <p className="text-base sm:text-lg font-semibold text-rose-900 flex items-center gap-2">
-                <UserIcon className="h-4 w-4 text-rose-400" />
-                <span className="truncate">{turno.cliente}</span>
-              </p>
-            </div>
-            <div className="space-y-1.5">
               <p className="text-xs sm:text-sm font-medium text-rose-500 uppercase tracking-wide">Servicio</p>
               <p className="text-base sm:text-lg font-semibold text-rose-900">{turno.servicio}</p>
             </div>
