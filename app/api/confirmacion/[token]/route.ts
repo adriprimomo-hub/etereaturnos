@@ -9,7 +9,10 @@ const extractToken = (paramsToken: string | undefined, url: URL) => {
       return raw
     }
   })()
-  const normalized = decoded.trim().replace(/[^A-Za-z0-9_-]/g, "")
+
+  // Intenta extraer la porción que parece un UUID (solo letras, números y guiones).
+  const candidate = decoded.match(/[0-9A-Za-z-]{20,}/)?.[0] ?? decoded
+  const normalized = candidate.trim().replace(/[^A-Za-z0-9-]/g, "")
 
   return { raw, token: normalized }
 }
@@ -146,5 +149,4 @@ export async function POST(request: Request, { params }: { params: { token: stri
     return Response.json({ error: "Error interno" }, { status: 500 })
   }
 }
-
 
