@@ -86,7 +86,7 @@ export default function ConfirmacionPage() {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-rose-50 via-rose-100/60 to-rose-50 p-4 sm:p-6">
         <div className="w-full max-w-xl rounded-2xl bg-white/80 backdrop-blur-sm border border-rose-100 shadow-lg px-6 py-8">
-          <p className="text-center text-rose-700 text-base sm:text-lg font-medium">Token inválido o expirado</p>
+          <p className="text-center text-rose-700 text-base sm:text-lg font-medium">Turno no encontrado</p>
         </div>
       </div>
     )
