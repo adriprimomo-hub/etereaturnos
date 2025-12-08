@@ -48,7 +48,7 @@ export function TurnoForm({ clientes, servicios, onSuccess, onCancel, turno }: T
     cliente_id: turno?.cliente_id || "",
     servicio_id: turno?.servicio_id || "",
     fecha_inicio: turno ? formatForInput(turno.fecha_inicio) : "",
-    duracion_minutos: turno?.duracion_minutos || "",
+    duracion_minutos: turno?.duracion_minutos,
     observaciones: turno?.observaciones || "",
   })
   const [loading, setLoading] = useState(false)
