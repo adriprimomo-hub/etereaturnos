@@ -235,7 +235,15 @@ export function TurnoForm({ clientes, servicios, onSuccess, onCancel, turno }: T
           </div>
           <Select
             value={formData.servicio_id}
-            onValueChange={(value) => setFormData({ ...formData, servicio_id: value })}
+            onValueChange={(value) => {
+              const servicioSeleccionado = servicios.find(s => s.id === value)
+          
+              setFormData({
+                ...formData,
+                servicio_id: value,
+                duracion_minutos: servicioSeleccionado?.duracion_minutos || 0,
+              })
+            }}
             required
           >
             <SelectTrigger>
