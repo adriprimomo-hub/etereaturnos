@@ -1,15 +1,29 @@
 import { supabaseAdmin } from "@/lib/supabase/admin"
 
+const extractToken = (paramsToken: string | undefined, url: URL) => {
+  const raw = paramsToken ?? url.pathname.split("/").filter(Boolean).pop() ?? ""
+  const decoded = (() => {
+    try {
+      return decodeURIComponent(raw)
+    } catch {
+      return raw
+    }
+  })()
+  const normalized = decoded.trim().replace(/[^A-Za-z0-9_-]/g, "")
+
+  return { raw, token: normalized }
+}
+
 export async function GET(request: Request, { params }: { params: { token: string } }) {
   try {
     const url = new URL(request.url)
-    const token =
-      params?.token || url.pathname.split("/").filter(Boolean).pop()
+    const { token, raw } = extractToken(params?.token, url)
 
     if (!token) {
       console.error("[confirmacion] Token faltante en GET", {
         pathname: url.pathname,
         search: url.search,
+        rawToken: raw,
       })
       return Response.json({ error: "Token requerido" }, { status: 400 })
     }
@@ -30,7 +44,8 @@ export async function GET(request: Request, { params }: { params: { token: strin
 
     if (!confirmation) {
       console.error("[confirmacion] Token no encontrado", {
-        token,
+        tokenRaw: raw,
+        tokenNormalized: token,
         supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
       })
       return Response.json({ error: "Token invalido o expirado" }, { status: 404 })
@@ -57,19 +72,19 @@ export async function GET(request: Request, { params }: { params: { token: strin
 export async function POST(request: Request, { params }: { params: { token: string } }) {
   try {
     const url = new URL(request.url)
-    const token =
-      params?.token || url.pathname.split("/").filter(Boolean).pop()
+    const { token, raw } = extractToken(params?.token, url)
 
     if (!token) {
       console.error("[confirmacion] Token faltante en POST", {
         pathname: url.pathname,
         search: url.search,
+        rawToken: raw,
       })
       return Response.json({ error: "Token requerido" }, { status: 400 })
     }
 
     const { confirmado } = await request.json()
-    // Obtener confirmación
+    // Obtener confirmacion
     const { data: confirmation, error } = await supabaseAdmin
       .from("confirmation_tokens")
       .select("*")
@@ -83,7 +98,8 @@ export async function POST(request: Request, { params }: { params: { token: stri
 
     if (!confirmation) {
       console.error("[confirmacion] Token no encontrado en POST", {
-        token,
+        tokenRaw: raw,
+        tokenNormalized: token,
         supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
       })
       return Response.json({ error: "Token invalido o expirado" }, { status: 404 })
@@ -130,4 +146,5 @@ export async function POST(request: Request, { params }: { params: { token: stri
     return Response.json({ error: "Error interno" }, { status: 500 })
   }
 }
+
 
