@@ -7,10 +7,9 @@ import type { Cliente } from "../clientes/clientes-list"
 import type { Servicio } from "../servicios/servicios-list"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { CerrarTurnoModal } from "../pagos/cerrar-turno-modal"
 import { TurnoForm } from "./turno-form"
 import { useState } from "react"
-import { BanIcon, Loader2Icon, MessageCircleIcon, PencilIcon, PlayIcon } from "lucide-react"
+import { BanIcon, Loader2Icon, MessageCircleIcon, PencilIcon } from "lucide-react"
 
 interface TurnoCardProps {
   turno: Turno
@@ -21,7 +20,6 @@ interface TurnoCardProps {
 }
 
 export function TurnoCard({ turno, onDelete, onRefresh, clientes, servicios }: TurnoCardProps) {
-  const [loading, setLoading] = useState(false)
   const [enviandoWhatsapp, setEnviandoWhatsapp] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
 
@@ -29,8 +27,6 @@ export function TurnoCard({ turno, onDelete, onRefresh, clientes, servicios }: T
   const hora = fecha.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })
   const fecha_str = fecha.toLocaleDateString("es-AR")
   const isFutureTurno = fecha.getTime() > Date.now()
-  const timeUntilStartMs = fecha.getTime() - Date.now()
-  const startTooEarly = turno.estado === "pendiente" && timeUntilStartMs > 60 * 60 * 1000
   const confirmWasSent =
     turno.confirmacion_estado === "enviada" ||
     turno.confirmacion_estado === "confirmado" ||
@@ -38,20 +34,6 @@ export function TurnoCard({ turno, onDelete, onRefresh, clientes, servicios }: T
     !!turno.confirmacion_enviada_at
   const canManageConfirmation =
     turno.estado === "pendiente" && isFutureTurno && turno.confirmacion_estado !== "confirmado"
-
-  const handleStatusChange = async (newStatus: string) => {
-    setLoading(true)
-    try {
-      await fetch(`/api/turnos/${turno.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ estado: newStatus }),
-      })
-      onRefresh()
-    } finally {
-      setLoading(false)
-    }
-  }
 
   const handleEnviarWhatsapp = async () => {
     const pendingWindow = typeof window !== "undefined" ? window.open("", "_blank") : null
@@ -148,26 +130,11 @@ export function TurnoCard({ turno, onDelete, onRefresh, clientes, servicios }: T
               )}
             </Button>
           )}
-          {turno.estado === "pendiente" && (
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => handleStatusChange("en_curso")}
-              disabled={loading || startTooEarly}
-              title={startTooEarly ? "Solo se puede iniciar hasta 1 hora antes del horario pactado" : undefined}
-              className="text-xs gap-1.5"
-            >
-              <PlayIcon className="h-3.5 w-3.5" />
-              Iniciar
-            </Button>
-          )}
-          {turno.estado === "en_curso" && <CerrarTurnoModal turno={turno} onSuccess={onRefresh} />}
           {turno.estado !== "completado" && (
             <Button
               size="sm"
               variant="destructive"
               onClick={() => onDelete(turno.id)}
-              disabled={loading}
               className="text-xs gap-1.5"
             >
               <BanIcon className="h-3.5 w-3.5" />
@@ -184,9 +151,6 @@ export function TurnoCard({ turno, onDelete, onRefresh, clientes, servicios }: T
             Editar
           </Button>
         </div>
-        {startTooEarly && (
-          <p className="text-[11px] text-muted-foreground">Solo se puede iniciar hasta 1 hora antes del horario pactado.</p>
-        )}
       </CardContent>
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
         <DialogContent className="max-w-2xl">
@@ -210,3 +174,4 @@ export function TurnoCard({ turno, onDelete, onRefresh, clientes, servicios }: T
     </Card>
   )
 }
+
