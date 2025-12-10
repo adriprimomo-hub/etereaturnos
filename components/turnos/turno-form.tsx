@@ -267,7 +267,7 @@ export function TurnoForm({ clientes, servicios, onSuccess, onCancel, turno }: T
             type="datetime-local"
             value={formData.fecha_inicio}
             onChange={(e) => setFormData({ ...formData, fecha_inicio: e.target.value })}
-            step=(300)
+            step={300}
             required
           />
         </div>
