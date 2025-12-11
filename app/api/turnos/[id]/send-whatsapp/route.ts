@@ -5,6 +5,8 @@ import { cookies } from "next/headers"
 import { type NextRequest, NextResponse } from "next/server"
 import { v4 as uuidv4 } from "uuid"
 
+const TIME_ZONE = "America/Argentina/Buenos_Aires"
+
 const defaultTemplate = `Hola {cliente}!
 
 Te compartimos los detalles de tu turno:
@@ -120,14 +122,16 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
 
     // Construir mensaje con variables
     const fecha = new Date(turno.fecha_inicio)
-    const fechaFormato = fecha.toLocaleDateString("es-ES", {
+    const fechaFormato = fecha.toLocaleDateString("es-AR", {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
+      timeZone: TIME_ZONE,
     })
-    const horaFormato = fecha.toLocaleTimeString("es-ES", {
+    const horaFormato = fecha.toLocaleTimeString("es-AR", {
       hour: "2-digit",
       minute: "2-digit",
+      timeZone: TIME_ZONE,
     })
 
     const { data: config } = await supabase
@@ -181,4 +185,3 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     return NextResponse.json({ error: "Error al procesar la solicitud" }, { status: 500 })
   }
 }
-
