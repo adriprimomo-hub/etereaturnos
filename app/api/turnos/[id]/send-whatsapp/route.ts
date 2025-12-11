@@ -132,6 +132,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       hour: "2-digit",
       minute: "2-digit",
       timeZone: TIME_ZONE,
+      hour12: false,
     })
 
     const { data: config } = await supabase
