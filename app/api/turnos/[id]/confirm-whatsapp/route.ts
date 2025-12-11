@@ -98,6 +98,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
       hour: "2-digit",
       minute: "2-digit",
       timeZone: TIME_ZONE,
+      hour12:false,
     })
 
     const confirmLink = `${resolveAppUrl({
