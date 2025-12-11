@@ -99,7 +99,11 @@ export default function ConfirmacionPage() {
     month: "long",
     day: "numeric",
   })
-  const horaStr = fecha.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })
+  const horaStr = fecha.toLocaleTimeString("es-AR", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  })
 
   const estadoBadge: Record<string, string> = {
     pendiente: "bg-yellow-100 text-yellow-800",
