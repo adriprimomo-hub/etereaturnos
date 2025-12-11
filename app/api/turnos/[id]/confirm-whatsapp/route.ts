@@ -2,6 +2,8 @@ import { resolveAppUrl } from "@/lib/url"
 import { createClient } from "@/lib/supabase/server"
 import { sanitizePhoneNumber } from "@/lib/whatsapp"
 
+const TIME_ZONE = "America/Argentina/Buenos_Aires"
+
 const defaultTemplate = `Hola {cliente}!
 
 Te compartimos los detalles de tu turno:
@@ -86,8 +88,17 @@ export async function POST(request: Request, { params }: { params: { id: string 
     }
 
     const fecha = new Date(turno.fecha_inicio)
-    const fechaStr = fecha.toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit", year: "numeric" })
-    const horaStr = fecha.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })
+    const fechaStr = fecha.toLocaleDateString("es-AR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      timeZone: TIME_ZONE,
+    })
+    const horaStr = fecha.toLocaleTimeString("es-AR", {
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZone: TIME_ZONE,
+    })
 
     const confirmLink = `${resolveAppUrl({
       headers: request.headers,
@@ -130,4 +141,3 @@ export async function POST(request: Request, { params }: { params: { id: string 
     return Response.json({ error: "Error interno" }, { status: 500 })
   }
 }
-
