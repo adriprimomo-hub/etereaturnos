@@ -142,7 +142,7 @@ export default function ConfirmacionPage() {
               </div>
             </div>
             <div className="space-y-1.5">
-              <p className="text-xs sm:text-sm font-medium text-rose-500 uppercase tracking-wide">Duración</p>
+              <p className="text-xs sm:text-sm font-medium text-rose-500 uppercase tracking-wide">Duración Aproximada</p>
               <p className="text-base sm:text-lg font-semibold text-rose-900">{turno.duracion} minutos</p>
             </div>
             {confirmado !== null && (
