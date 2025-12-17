@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
+import { closeExpiredTurnos } from "@/lib/turnos"
 import { NextResponse } from "next/server"
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -9,6 +10,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   const { id } = await params
 
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+
+  await closeExpiredTurnos(supabase, user.id)
 
   // Obtener info cliente
   const { data: cliente } = await supabase.from("clientes").select("*").eq("id", id).eq("usuario_id", user.id).single()
@@ -33,7 +36,13 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     .in("turno_id", turnos?.map((t: any) => t.id) || [])
     .eq("usuario_id", user.id)
 
-  const totalGastado = pagos?.reduce((sum: number, p: any) => sum + p.monto, 0) || 0
+  const pagosPorTurno = new Set(pagos?.map((p: any) => p.turno_id) || [])
+  const totalPagos = pagos?.reduce((sum: number, p: any) => sum + Number(p.monto || 0), 0) || 0
+  const completadosSinPago =
+    turnos
+      ?.filter((t: any) => t.estado === "completado" && !pagosPorTurno.has(t.id))
+      .reduce((sum: number, t: any) => sum + Number(t.servicios?.precio || 0), 0) || 0
+  const totalGastado = totalPagos + completadosSinPago
   const visitasCompletadas = turnos?.filter((t: any) => t.estado === "completado").length || 0
   const asistencia =
     visitasCompletadas > 0
