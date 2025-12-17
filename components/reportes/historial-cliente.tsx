@@ -94,12 +94,13 @@ export function HistorialCliente({ clienteId }: HistorialClienteProps) {
               {reporte.historial.map((turno) => (
                 <TableRow key={turno.id}>
                   <TableCell>
-                    {new Date(turno.fecha_inicio).toLocaleDateString("es-AR", {
+                    {new Date(turno.fecha_inicio).toLocaleString("es-AR", {
                       day: "2-digit",
                       month: "2-digit",
                       year: "numeric",
                       hour: "2-digit",
                       minute: "2-digit",
+                      hour12: false,
                     })}
                   </TableCell>
                   <TableCell>{turno.servicios.nombre}</TableCell>
@@ -112,7 +113,7 @@ export function HistorialCliente({ clienteId }: HistorialClienteProps) {
                       {turno.estado}
                     </Badge>
                   </TableCell>
-                  <TableCell>{turno.asistio === null ? "-" : turno.asistio ? "Asistió" : "No asistió"}</TableCell>
+                  <TableCell>{turno.asistio === null ? "-" : turno.asistio ? "Asistio" : "No asistio"}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
