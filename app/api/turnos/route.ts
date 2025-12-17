@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
+import { closeExpiredTurnos } from "@/lib/turnos"
 import { NextResponse } from "next/server"
 
 export async function GET(request: Request) {
@@ -14,6 +15,8 @@ export async function GET(request: Request) {
   const fechaFin = url.searchParams.get("fecha_fin")
   const clienteId = url.searchParams.get("cliente_id")
   const estado = url.searchParams.get("estado")
+
+  await closeExpiredTurnos(supabase, user.id)
 
   let query = supabase
     .from("turnos")
