@@ -1,7 +1,6 @@
 "use client"
 
-import type React from "react"
-
+import type { FormEvent } from "react"
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -72,7 +71,7 @@ export function TurnoForm({ clientes, servicios, onSuccess, onCancel, turno }: T
     }
   }, [turno])
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setErrorMessage(null)
@@ -332,3 +331,4 @@ export function TurnoForm({ clientes, servicios, onSuccess, onCancel, turno }: T
     </form>
   )
 }
+
