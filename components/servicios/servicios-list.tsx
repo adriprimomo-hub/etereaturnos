@@ -10,6 +10,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { PencilIcon, PlusIcon, Trash2Icon, XIcon } from "lucide-react"
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
+const currencyFormatter = new Intl.NumberFormat("es-AR", {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+})
+
+const formatCurrency = (value: number) => currencyFormatter.format(value)
 
 export interface Servicio {
   id: string
@@ -90,7 +96,7 @@ export function ServiciosList() {
                 <TableRow key={servicio.id}>
                   <TableCell className="font-medium">{servicio.nombre}</TableCell>
                   <TableCell>{servicio.duracion_minutos} min</TableCell>
-                  <TableCell>${servicio.precio.toFixed(2)}</TableCell>
+                  <TableCell>${formatCurrency(servicio.precio)}</TableCell>
                   <TableCell>
                     <span
                       className={`px-2 py-1 rounded text-sm font-medium ${

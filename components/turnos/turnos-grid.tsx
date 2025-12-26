@@ -351,7 +351,7 @@ export function TurnosGrid() {
                       {dayTurnos.length === 0 && (
                         <p className="absolute left-2 top-2 text-[11px] text-muted-foreground/70">Sin turnos</p>
                       )}
-                      {dayTurnos.map((turno) => {
+                      {dayTurnos.map((turno, index) => {
                         const fecha = new Date(turno.fecha_inicio)
                         const duration = getTurnoDuration(turno)
                         const startMinutes = fecha.getHours() * 60 + fecha.getMinutes()
@@ -360,7 +360,8 @@ export function TurnosGrid() {
                         const durationSlotsRaw = Math.max(duration / SLOT_MINUTES, 0.5)
                         const clampedDuration = Math.min(durationSlotsRaw, slots.length - clampedStart)
                         const top = clampedStart * SLOT_HEIGHT
-                        const height = Math.max(SLOT_HEIGHT * 0.75, clampedDuration * SLOT_HEIGHT - 6)
+                        const minHeight = SLOT_HEIGHT * 1.6
+                        const height = Math.max(minHeight, clampedDuration * SLOT_HEIGHT - 6)
                         const horaInicio = fecha.toLocaleTimeString("es-AR", {
                           hour: "2-digit",
                           minute: "2-digit",
@@ -378,8 +379,8 @@ export function TurnosGrid() {
                             key={turno.id}
                             type="button"
                             onClick={() => setSelectedTurnoId(turno.id)}
-                            className="absolute left-1 right-1 overflow-hidden rounded-xl border bg-white/95 p-2 text-left shadow-sm transition hover:border-rose-200 hover:bg-rose-50 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-rose-300"
-                            style={{ top: `${top}px`, height: `${height}px` }}
+                            className="absolute left-1 right-1 rounded-xl border bg-white/95 p-2 text-left shadow-sm transition hover:border-rose-200 hover:bg-rose-50 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-rose-300"
+                            style={{ top: `${top}px`, height: `${height}px`, minHeight: `${minHeight}px`, zIndex: 10 + index }}
                           >
                             <div className="flex flex-wrap items-center justify-between gap-1 text-[11px] font-semibold leading-4 text-rose-700">
                               <span>
