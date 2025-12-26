@@ -5,9 +5,13 @@ import useSWR from "swr"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts"
-
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
+const currencyFormatter = new Intl.NumberFormat("es-AR", {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+})
+
+const formatCurrency = (value: number) => currencyFormatter.format(value)
 
 interface Reporte {
   periodo: string
@@ -58,32 +62,11 @@ export function ReportesServicios() {
             <CardTitle className="text-sm font-medium">Ingresos Totales</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold">${(reporte?.ingresos_totales || 0).toFixed(2)}</p>
+            <p className="text-3xl font-bold">${formatCurrency(reporte?.ingresos_totales || 0)}</p>
             <p className="text-sm text-muted-foreground">{reporte?.periodo}</p>
           </CardContent>
         </Card>
       </div>
-
-      {reporte?.servicios && reporte.servicios.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Gráfico de Servicios</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={reporte.servicios}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="nombre" angle={-45} textAnchor="end" height={80} />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="cantidad" fill="#ec4899" name="Cantidad" />
-                <Bar dataKey="ingresos" fill="#06b6d4" name="Ingresos" />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      )}
 
       <Card>
         <CardHeader>
@@ -104,8 +87,8 @@ export function ReportesServicios() {
                 <TableRow key={idx}>
                   <TableCell className="font-medium">{servicio.nombre}</TableCell>
                   <TableCell>{servicio.cantidad}</TableCell>
-                  <TableCell>${servicio.precio.toFixed(2)}</TableCell>
-                  <TableCell className="font-semibold">${servicio.ingresos.toFixed(2)}</TableCell>
+                  <TableCell>${formatCurrency(servicio.precio)}</TableCell>
+                  <TableCell className="font-semibold">${formatCurrency(servicio.ingresos)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

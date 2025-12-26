@@ -6,6 +6,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge"
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
+const currencyFormatter = new Intl.NumberFormat("es-AR", {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+})
+
+const formatCurrency = (value: number) => currencyFormatter.format(value)
 
 interface ClienteReporte {
   cliente: any
@@ -71,7 +77,7 @@ export function HistorialCliente({ clienteId }: HistorialClienteProps) {
             <CardTitle className="text-sm font-medium">Total Gastado</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">${stats.total_gastado.toFixed(2)}</p>
+            <p className="text-2xl font-bold">${formatCurrency(stats.total_gastado)}</p>
           </CardContent>
         </Card>
       </div>
