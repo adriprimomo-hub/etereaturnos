@@ -49,12 +49,41 @@ export async function closeExpiredTurnos(supabase: SupabaseClient, userId: strin
     updated_at: nowIso,
   }))
 
-  const { data: updated, error: updateError } = await supabase.from("turnos").upsert(updates).select("id")
+  const results = await Promise.allSettled(
+    updates.map((update) =>
+      supabase
+        .from("turnos")
+        .update({
+          estado: update.estado,
+          fecha_fin: update.fecha_fin,
+          updated_at: update.updated_at,
+        })
+        .eq("id", update.id)
+        .eq("usuario_id", userId)
+        .select("id")
+        .single(),
+    ),
+  )
 
-  if (updateError) {
-    console.error("[turnos] No se pudieron cerrar turnos vencidos", updateError)
-    return []
-  }
+  const updatedIds: string[] = []
 
-  return updated?.map((row) => row.id) || []
+  results.forEach((result, index) => {
+    if (result.status === "fulfilled") {
+      if (result.value.error) {
+        console.error("[turnos] No se pudieron cerrar turnos vencidos", result.value.error)
+        return
+      }
+      if (result.value.data?.id) {
+        updatedIds.push(result.value.data.id)
+      }
+      return
+    }
+
+    console.error("[turnos] No se pudieron cerrar turnos vencidos", {
+      error: result.reason,
+      turnoId: updates[index]?.id,
+    })
+  })
+
+  return updatedIds
 }
