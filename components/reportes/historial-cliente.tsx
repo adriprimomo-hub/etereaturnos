@@ -87,7 +87,6 @@ export function HistorialCliente({ clienteId }: HistorialClienteProps) {
                 <TableHead>Fecha</TableHead>
                 <TableHead>Servicio</TableHead>
                 <TableHead>Estado</TableHead>
-                <TableHead>Asistencia</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -113,7 +112,6 @@ export function HistorialCliente({ clienteId }: HistorialClienteProps) {
                       {turno.estado}
                     </Badge>
                   </TableCell>
-                  <TableCell>{turno.asistio === null ? "-" : turno.asistio ? "Asistio" : "No asistio"}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
