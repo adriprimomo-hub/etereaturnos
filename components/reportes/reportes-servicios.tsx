@@ -28,6 +28,7 @@ interface Reporte {
 export function ReportesServicios() {
   const [periodo, setPeriodo] = useState("30")
   const { data: reporte } = useSWR<Reporte>(`/api/reportes/servicios?periodo=${periodo}`, fetcher)
+  const servicios = Array.isArray(reporte?.servicios) ? reporte?.servicios : []
 
   return (
     <div className="space-y-6">
@@ -83,7 +84,7 @@ export function ReportesServicios() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {reporte?.servicios.map((servicio, idx) => (
+              {servicios.map((servicio, idx) => (
                 <TableRow key={idx}>
                   <TableCell className="font-medium">{servicio.nombre}</TableCell>
                   <TableCell>{servicio.cantidad}</TableCell>

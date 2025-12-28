@@ -10,7 +10,16 @@ import { ClienteHistorialModal } from "./cliente-historial"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { PencilIcon, Trash2Icon, UserPlusIcon, XIcon } from "lucide-react"
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json())
+const fetcher = async (url: string): Promise<Cliente[]> => {
+  const res = await fetch(url)
+  const data = await res.json()
+
+  if (Array.isArray(data)) return data
+  if (Array.isArray(data?.data)) return data.data
+
+  console.warn("Respuesta inesperada del endpoint", url, data)
+  return []
+}
 
 export interface Cliente {
   id: string
@@ -21,12 +30,12 @@ export interface Cliente {
 }
 
 export function ClientesList() {
-  const { data: clientes, mutate } = useSWR<Cliente[]>("/api/clientes", fetcher)
+  const { data: clientes = [], mutate } = useSWR<Cliente[]>("/api/clientes", fetcher)
   const [showForm, setShowForm] = useState(false)
   const [search, setSearch] = useState("")
   const [selectedCliente, setSelectedCliente] = useState<Cliente | null>(null)
 
-  const filtered = clientes?.filter((c) => `${c.nombre} ${c.apellido}`.toLowerCase().includes(search.toLowerCase()))
+  const filtered = clientes.filter((c) => `${c.nombre} ${c.apellido}`.toLowerCase().includes(search.toLowerCase()))
 
   const handleDelete = async (id: string) => {
     if (!confirm("¿Eliminar cliente?")) return

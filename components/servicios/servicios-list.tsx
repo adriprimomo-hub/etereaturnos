@@ -9,7 +9,16 @@ import { ServicioForm } from "./servicio-form"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { PencilIcon, PlusIcon, Trash2Icon, XIcon } from "lucide-react"
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json())
+const fetcher = async (url: string): Promise<Servicio[]> => {
+  const res = await fetch(url)
+  const data = await res.json()
+
+  if (Array.isArray(data)) return data
+  if (Array.isArray(data?.data)) return data.data
+
+  console.warn("Respuesta inesperada del endpoint", url, data)
+  return []
+}
 const currencyFormatter = new Intl.NumberFormat("es-AR", {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
@@ -26,12 +35,12 @@ export interface Servicio {
 }
 
 export function ServiciosList() {
-  const { data: servicios, mutate } = useSWR<Servicio[]>("/api/servicios", fetcher)
+  const { data: servicios = [], mutate } = useSWR<Servicio[]>("/api/servicios", fetcher)
   const [showForm, setShowForm] = useState(false)
   const [search, setSearch] = useState("")
   const [selectedServicio, setSelectedServicio] = useState<Servicio | null>(null)
 
-  const filtered = servicios?.filter((s) => s.nombre.toLowerCase().includes(search.toLowerCase()))
+  const filtered = servicios.filter((s) => s.nombre.toLowerCase().includes(search.toLowerCase()))
 
   const handleDelete = async (id: string) => {
     if (!confirm("¿Eliminar servicio?")) return
