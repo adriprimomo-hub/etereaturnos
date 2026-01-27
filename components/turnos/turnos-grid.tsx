@@ -395,15 +395,10 @@ export function TurnosGrid() {
                                 {confirmacionLabel[confirmState] ?? formatLabel(confirmState)}
                               </span>
                             </div>
-                            <p className="mt-1 text-sm font-semibold leading-tight">
+                            <p className="mt-1 line-clamp-1 text-sm font-semibold leading-tight">
                               {turno.clientes.nombre} {turno.clientes.apellido}
                             </p>
-                            <p className="text-xs text-muted-foreground">{turno.servicios.nombre}</p>
-                            <div className="mt-1 flex flex-wrap gap-1">
-                              {turno.observaciones && (
-                                <span className="truncate text-[11px] text-muted-foreground">{turno.observaciones}</span>
-                              )}
-                            </div>
+                            <p className="line-clamp-1 text-xs text-muted-foreground">{turno.servicios.nombre}</p>
                           </button>
                         )
                       })}
