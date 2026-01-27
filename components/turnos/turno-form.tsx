@@ -1,7 +1,7 @@
 "use client"
 
 import type { FormEvent } from "react"
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -25,6 +25,7 @@ import type { Cliente } from "../clientes/clientes-list"
 import type { Servicio } from "../servicios/servicios-list"
 import type { Turno } from "./turnos-grid"
 import { CalendarPlusIcon, Loader2Icon, SaveIcon, SearchIcon, XIcon } from "lucide-react"
+import { sortClientes } from "@/lib/clientes"
 
 const formatForInput = (dateString: string) => {
   if (!dateString) return ""
@@ -56,6 +57,7 @@ export function TurnoForm({ clientes, servicios, onSuccess, onCancel, turno }: T
   const [servicioSearchOpen, setServicioSearchOpen] = useState(false)
 
   const selectedServicio = servicios.find((s) => s.id === formData.servicio_id)
+  const orderedClientes = useMemo(() => sortClientes(clientes), [clientes])
   const isEditing = Boolean(turno)
   const isFutureTurno = turno ? new Date(turno.fecha_inicio).getTime() > Date.now() : true
 
@@ -150,7 +152,7 @@ export function TurnoForm({ clientes, servicios, onSuccess, onCancel, turno }: T
                     <CommandList>
                       <CommandEmpty>No se encontraron clientes</CommandEmpty>
                       <CommandGroup>
-                        {clientes.map((c) => (
+                        {orderedClientes.map((c) => (
                           <CommandItem
                             key={c.id}
                             value={`${c.nombre} ${c.apellido} ${c.telefono}`}
@@ -181,7 +183,7 @@ export function TurnoForm({ clientes, servicios, onSuccess, onCancel, turno }: T
               <SelectValue placeholder="Seleccionar cliente" />
             </SelectTrigger>
             <SelectContent>
-              {clientes.map((c) => (
+              {orderedClientes.map((c) => (
                 <SelectItem key={c.id} value={c.id}>
                   {`${c.nombre} ${c.apellido}`}
                 </SelectItem>
