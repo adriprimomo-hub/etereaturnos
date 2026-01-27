@@ -13,7 +13,8 @@ export async function GET() {
     .from("clientes")
     .select("*")
     .eq("usuario_id", user.id)
-    .order("created_at", { ascending: false })
+    .order("nombre", { ascending: true })
+    .order("apellido", { ascending: true })
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json(data)
