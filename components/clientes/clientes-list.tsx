@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import useSWR from "swr"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -9,6 +9,7 @@ import { ClienteForm } from "./cliente-form"
 import { ClienteHistorialModal } from "./cliente-historial"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { PencilIcon, Trash2Icon, UserPlusIcon, XIcon } from "lucide-react"
+import { sortClientes } from "@/lib/clientes"
 
 const fetcher = async (url: string): Promise<Cliente[]> => {
   const res = await fetch(url)
@@ -35,7 +36,11 @@ export function ClientesList() {
   const [search, setSearch] = useState("")
   const [selectedCliente, setSelectedCliente] = useState<Cliente | null>(null)
 
-  const filtered = clientes.filter((c) => `${c.nombre} ${c.apellido}`.toLowerCase().includes(search.toLowerCase()))
+  const orderedClientes = useMemo(() => sortClientes(clientes), [clientes])
+  const filtered = useMemo(
+    () => orderedClientes.filter((c) => `${c.nombre} ${c.apellido}`.toLowerCase().includes(search.toLowerCase())),
+    [orderedClientes, search],
+  )
 
   const handleDelete = async (id: string) => {
     if (!confirm("¿Eliminar cliente?")) return
