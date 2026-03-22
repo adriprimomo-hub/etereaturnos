@@ -5,6 +5,7 @@ import { useParams } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import Image from "next/image"
 import { CalendarDaysIcon, Clock3Icon, SparklesIcon, UserIcon } from "lucide-react"
 
 interface TurnoInfo {
@@ -181,6 +182,12 @@ export default function ConfirmacionPage() {
             </div>
           )}
         </CardContent>
+        <div className="px-6 py-4 bg-rose-50 border-t border-rose-100 flex items-center justify-center gap-3">
+          <Image src="/sicaip_logo.PNG" alt="SIcAIP" width={28} height={28} className="object-contain" />
+          <p className="text-xs sm:text-sm text-rose-600">
+            Sistema desarrollado a medida por <a href="https://sicaip-arg.vercel.app" target="_blank" rel="noopener noreferrer" className="font-bold hover:underline">SIcAIP</a>
+          </p>
+        </div>
       </Card>
     </div>
   )
